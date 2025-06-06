@@ -32,8 +32,8 @@ The current prompt has been assembled to produce commit messages that adhere to 
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/git-commit-message-generator.git
-   cd git-commit-message-generator
+   git clone https://github.com/gmauro/commitassistant.git
+   cd commitassistant
    ```
 
 2. **Make the script executable**:
