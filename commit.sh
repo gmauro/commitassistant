@@ -1,52 +1,33 @@
 #!/bin/bash
 
 # Configurable model name
-MODEL="${MODEL:-llama3.1:8b-instruct-q6_K}"
+MODEL="${MODEL:-mistral:latest}"
 
 # Configurable prompt message template
 PROMPT_TEMPLATE="${PROMPT_TEMPLATE:-$(cat <<EOF
-Generate a git commit message for these changes. The message must have:
+You are an AI assistant helping developers write clear and concise git commit messages following the Conventional Commits specification. The Conventional Commits specification is a lightweight convention on top of commit messages. It provides an easy set of rules for creating an explicit commit history, which makes it easier to write automated tools on top of it.
+Instructions:
 
-1. TITLE LINE: A specific, concise summary (max 50 chars) that clearly
-   describes the primary change or feature. The title should follow
-   the conventional commit format and provide meaningful context for future readers.
+    Understand the Commit Type: Identify the type of commit from the following list:
+        feat: A new feature.
+        fix: A bug fix.
+        docs: Documentation only changes.
+        style: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc).
+        refactor: A code change that neither fixes a bug nor adds a feature.
+        perf: A code change that improves performance.
+        test: Adding missing tests or correcting existing tests.
+        build: Changes that affect the build system or external dependencies.
+        ci: Changes to our CI configuration files and scripts.
+        chore: Other changes that do not modify src or test files.
+        revert: Reverts a previous commit.
 
-2. DETAILED DESCRIPTION: A thorough explanation including:
-   - What changes were made
-   - Why they were necessary
-   - Any important technical details
-   - Breaking changes or important notes
-   - use plain text
-   Wrap this at 72 chars.
+    Scope (Optional): If applicable, include a scope to provide additional contextual information. The scope should be a noun describing a section of the codebase enclosed in parentheses, e.g., feat(parser): or fix(api):.
 
-IMPORTANT:
-- Output ONLY the commit message
-- Make sure the title is specific to these changes
-- The commit contains the following structural elements, to communicate intent to the consumers of your library:
-  - fix: a commit of the type fix patches a bug in your codebase (this correlates with PATCH in Semantic Versioning).
-  - feat: a commit of the type feat introduces a new feature to the codebase (this correlates with MINOR in Semantic Versioning).
-  - BREAKING CHANGE: a commit that has a footer BREAKING CHANGE:, or appends a ! after the type/scope, introduces a breaking API change (correlating with MAJOR in Semantic Versioning). A BREAKING CHANGE can be part of commits of any type.
-  - types other than fix: and feat: are allowed, for example @commitlint/config-conventional (based on the Angular convention) recommends build:, chore:, ci:, docs:, style:, refactor:, perf:, test:, and others.
+    Subject: Write a short (max 50 chars), imperative tense description of the change. It should be concise and clear, starting with a lowercase letter and without a period at the end.
 
-Specification
-The key words 'MUST', 'MUST' 'NOT', 'REQUIRED', 'SHALL', 'SHALL NOT', 'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'MAY', and 'OPTIONAL' in this document are to be interpreted as described in RFC 2119.
+    Body (Optional): If necessary, provide a longer description of the change. This should include the motivation for the change and contrast it with previous behavior.
 
-- Commits MUST be prefixed with a type, which consists of a noun, feat, fix, etc., followed by the OPTIONAL scope, OPTIONAL !, and REQUIRED terminal colon and space.
-- The type feat MUST be used when a commit adds a new feature to your application or library.
-- The type fix MUST be used when a commit represents a bug fix for your application.
-- A scope MAY be provided after a type. A scope MUST consist of a noun describing a section of the codebase surrounded by parenthesis:
-- A description MUST immediately follow the colon and space after the type/scope prefix. The description is a short summary of the code changes, e.g., fix: array parsing issue when multiple spaces were contained in string.
-- A longer commit body MAY be provided after the short description, providing additional contextual information about the code changes. The body MUST begin one blank line after the description.
-- A commit body is free-form and MAY consist of any number of newline separated paragraphs.
-- One or more footers MAY be provided one blank line after the body. Each footer MUST consist of a word token, followed by either a :<space> or <space># separator, followed by a string value (this is inspired by the git trailer convention).
-- A footer’s token MUST use - in place of whitespace characters, e.g., Acked-by (this helps differentiate the footer section from a multi-paragraph body). An exception is made for BREAKING CHANGE, which MAY also be used as a token.
-- A footer’s value MAY contain spaces and newlines, and parsing MUST terminate when the next valid footer token/separator pair is observed.
-- Breaking changes MUST be indicated in the type/scope prefix of a commit, or as an entry in the footer.
-- If included as a footer, a breaking change MUST consist of the uppercase text BREAKING CHANGE, followed by a colon, space, and description, e.g., BREAKING CHANGE: environment variables now take precedence over config files.
-- If included in the type/scope prefix, breaking changes MUST be indicated by a ! immediately before the :. If ! is used, BREAKING CHANGE: MAY be omitted from the footer section, and the commit description SHALL be used to describe the breaking change.
-- Types other than feat and fix MAY be used in your commit messages, e.g., docs: update ref docs.
-- The units of information that make up Conventional Commits MUST NOT be treated as case sensitive by implementors, with the exception of BREAKING CHANGE which MUST be uppercase.
-- BREAKING-CHANGE MUST be synonymous with BREAKING CHANGE, when used as a token in a footer.
+    Footer (Optional): If there are any breaking changes or issues that this commit closes, include them here. Breaking changes should start with BREAKING CHANGE: followed by a description. Issues should be referenced with Closes #<issue-number>.
 
 EOF
 )}"
@@ -88,7 +69,7 @@ main() {
     check_changes
 #    git add --all
     commit_message=$(generate_commit_message)
-    echo "$commit_message"
+#    echo "$commit_message"
     confirm_commit_message "$commit_message"
     git commit -m "$commit_message"
 }
