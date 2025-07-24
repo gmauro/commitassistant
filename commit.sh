@@ -1,33 +1,32 @@
 #!/bin/bash
 
 # Configurable model name
-MODEL="${MODEL:-mistral:latest}"
+MODEL="${MODEL:-mistral-nemo:12b-instruct-2407-q3_K_L}"
 
 # Configurable prompt message template
 PROMPT_TEMPLATE="${PROMPT_TEMPLATE:-$(cat <<EOF
-You are an AI assistant helping developers write clear and concise git commit messages following the Conventional Commits specification. The Conventional Commits specification is a lightweight convention on top of commit messages. It provides an easy set of rules for creating an explicit commit history, which makes it easier to write automated tools on top of it.
-Instructions:
+You are an AI assistant designed to help developers write clear and concise Git commit messages following the Conventional Commits specification.
+Your task is to suggest a commit message to the developer that adheres to the following structure and guidelines:
 
-    Understand the Commit Type: Identify the type of commit from the following list:
-        feat: A new feature.
-        fix: A bug fix.
-        docs: Documentation only changes.
-        style: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc).
-        refactor: A code change that neither fixes a bug nor adds a feature.
-        perf: A code change that improves performance.
-        test: Adding missing tests or correcting existing tests.
-        build: Changes that affect the build system or external dependencies.
-        ci: Changes to our CI configuration files and scripts.
-        chore: Other changes that do not modify src or test files.
-        revert: Reverts a previous commit.
+    Subject Line:
+        The subject line must start with the type of the commit.
+        The subject line must be no more than 50 characters long.
+        The type must be one of the following:
+            feat: A new feature
+            fix: A bug fix
+            docs: Documentation only changes
+            style: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+            refactor: A code change that neither fixes a bug nor adds a feature
+            perf: A code change that improves performance
+            test: Adding missing tests or correcting existing tests
+            chore: Changes to the build process or auxiliary tools and libraries such as documentation generation
 
-    Scope (Optional): If applicable, include a scope to provide additional contextual information. The scope should be a noun describing a section of the codebase enclosed in parentheses, e.g., feat(parser): or fix(api):.
+    Body:
+        The body must provide a longer description of the change.
+        The body must include the motivation for the change and contrast this with previous behavior.
 
-    Subject: Write a short (max 50 chars), imperative tense description of the change. It should be concise and clear, starting with a lowercase letter and without a period at the end.
-
-    Body (Optional): If necessary, provide a longer description of the change. This should include the motivation for the change and contrast it with previous behavior.
-
-    Footer (Optional): If there are any breaking changes or issues that this commit closes, include them here. Breaking changes should start with BREAKING CHANGE: followed by a description. Issues should be referenced with Closes #<issue-number>.
+    Footer (optional):
+        The footer can include information about breaking changes and is also the place to reference GitHub issues that this commit closes.
 
 EOF
 )}"
@@ -47,8 +46,9 @@ check_changes() {
 generate_commit_message() {
     local diff_content=$(git diff --cached)
     local files_changed=$(git status --porcelain -uno)
+    local previous_log=$(git log -n 10 --oneline)
 
-    echo -e "Files changed:\n$files_changed\n\nChanges:\n$diff_content" | \
+    echo -e "Files changed:\n$files_changed\n\nChanges:\n$diff_content\n\nPrevious log:\n$previous_log" | \
         llm -m "$MODEL" "$PROMPT_TEMPLATE"
 }
 

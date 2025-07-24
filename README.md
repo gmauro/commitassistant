@@ -11,22 +11,26 @@ The current prompt has been assembled to produce commit messages that adhere to 
 
 ## Dependencies
 
-- [Datasette](https://llm.datasette.io/en/stable/)
+- [llm](https://llm.datasette.io/en/stable/)
 - [Ollama](https://ollama.ai/)
-- `llama3.1` model
+- `mistral-nemo` model
 
 ## Installation
 
-1. **Install Datasette and its plugins**:
+1. **Install llm and its plugins**:
    ```bash
-   pip install datasette llm llm-ollama
+   pip install llm llm-ollama
    ```
 
 2. **Install Ollama**:
    Follow the instructions on the [Ollama website](https://ollama.ai/) to install the necessary dependencies.
 
-3. **Download the `llama3.1` model**:
-   Ensure you have the `llama3.1` model available and configured for use with the `llm` command-line tool.
+3. **Download the `mistral-nemo` model**:
+   Ensure you have the `mistral-nemo:12b-instruct-2407-q3_K_L` model available and configured for use with the `llm` command-line tool.
+   You can pull the model from Ollama
+   ```bash
+   ollama pull mistral-nemo:12b-instruct-2407-q3_K_L
+   ```
 
 ## Usage
 
